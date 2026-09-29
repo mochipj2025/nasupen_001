@@ -202,6 +202,74 @@ function wrapCanvasText(context, text, x, y, maxWidth, lineHeight) {
   return currentY;
 }
 
+
+let resultImageUrl;
+
+function clearResultImage() {
+  document.getElementById("result-image-panel")?.remove();
+  if (resultImageUrl) URL.revokeObjectURL(resultImageUrl);
+  resultImageUrl = undefined;
+}
+
+function showResultImage(blob, filename) {
+  clearResultImage();
+  resultImageUrl = URL.createObjectURL(blob);
+  const panel = document.createElement("section");
+  panel.id = "result-image-panel";
+  panel.className = "result-image-panel";
+  panel.setAttribute("aria-labelledby", "result-image-heading");
+  const heading = document.createElement("h2");
+  heading.id = "result-image-heading";
+  heading.textContent = "画像ができました";
+  heading.tabIndex = -1;
+  const guide = document.createElement("p");
+  guide.textContent = "iPhoneでは「画像を保存・共有する」を押し、メニューに「画像を保存」があれば選んでください。表示されない場合は、下の画像を長押しして保存メニューを確認してください。";
+  const image = document.createElement("img");
+  image.src = resultImageUrl;
+  image.alt = "今回の心の現在地チェック結果。保存用の画像";
+  const status = document.createElement("p");
+  status.className = "note";
+  status.setAttribute("role", "status");
+  const file = new File([blob], filename, { type: "image/png" });
+  let canShare = false;
+  try { canShare = Boolean(navigator.share && navigator.canShare?.({ files: [file] })); } catch {}
+  panel.append(heading, guide);
+  if (canShare) {
+    const share = document.createElement("button");
+    share.type = "button";
+    share.className = "button primary";
+    share.textContent = "画像を保存・共有する";
+    share.addEventListener("click", async () => {
+      share.disabled = true;
+      status.textContent = "";
+      try {
+        await navigator.share({ files: [file] });
+      } catch (error) {
+        if (error.name !== "AbortError") {
+          status.textContent = "共有メニューを開けませんでした。画像の長押し、または下のダウンロードをお試しください。";
+        }
+      } finally {
+        share.disabled = false;
+      }
+    });
+    panel.append(share);
+  } else {
+    guide.textContent = "下の画像を長押しして保存メニューを確認するか、「PNGをダウンロードする」を押してください。iPhoneでダウンロードした場合は、ブラウザのダウンロード一覧や「ファイル」アプリを確認してください。";
+  }
+  const download = document.createElement("a");
+  download.className = "button secondary";
+  download.href = resultImageUrl;
+  download.download = filename;
+  download.textContent = "PNGをダウンロードする";
+  download.addEventListener("click", () => {
+    status.textContent = "ダウンロードを開始します。ブラウザのダウンロード一覧や「ファイル」アプリを確認してください。";
+  });
+  panel.append(image, download, status);
+  document.getElementById("download-card").insertAdjacentElement("afterend", panel);
+  heading.focus({ preventScroll: true });
+  panel.scrollIntoView({ behavior: "smooth", block: "start" });
+}
+
 async function downloadResultCard() {
   const { scores, top } = calculateResult();
   const canvas = document.createElement("canvas");
@@ -262,17 +330,7 @@ async function downloadResultCard() {
     });
     const today = new Date();
     const dateStamp = [today.getFullYear(), String(today.getMonth() + 1).padStart(2, "0"), String(today.getDate()).padStart(2, "0")].join("-");
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement("a");
-    link.href = url;
-    link.download = `heart-check-result-${dateStamp}.png`;
-    link.rel = "noopener";
-    link.style.display = "none";
-    document.body.append(link);
-    link.click();
-    link.remove();
-    setTimeout(() => URL.revokeObjectURL(url), 120000);
-    toast("結果画像の保存を開始しました");
+    showResultImage(blob, `heart-check-result-${dateStamp}.png`);
   } catch (error) {
     console.error("PNG save failed:", error);
     toast("画像を保存できませんでした");
@@ -280,6 +338,7 @@ async function downloadResultCard() {
 }
 
 function resetAndStart() {
+  clearResultImage();
   answers = Array(questions.length).fill(null);
   currentIndex = 0;
   document.getElementById("reflection-text").value = "";
@@ -300,6 +359,7 @@ document.querySelectorAll(".copy-button").forEach(button => button.addEventListe
 document.getElementById("download-card").addEventListener("click", downloadResultCard);
 document.querySelectorAll(".retry-button").forEach(button => button.addEventListener("click", resetAndStart));
 document.querySelectorAll(".home-button").forEach(button => button.addEventListener("click", () => {
+  clearResultImage();
   answers = Array(questions.length).fill(null);
   currentIndex = 0;
   document.getElementById("reflection-text").value = "";

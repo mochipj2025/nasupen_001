@@ -94,3 +94,25 @@
 .reflection-panel label{margin-top:8px}
 .download-card{margin-top:16px}
 #result .share-panel{margin-top:28px}
+
+/* Keep image saving steps visible on small screens. */
+.result-image-panel {
+  margin: 20px 0 28px;
+  padding: 20px;
+  border: 2px solid #426d57;
+  border-radius: 20px;
+  background: #f3f8f2;
+  scroll-margin-top: 16px;
+}
+.result-image-panel h2 { margin: 0 0 12px; font-size: 1.3rem; }
+.result-image-panel p { line-height: 1.8; }
+.result-image-panel img {
+  display: block;
+  width: 100%;
+  height: auto;
+  margin: 20px 0;
+  border: 1px solid #d6dfd5;
+  border-radius: 12px;
+}
+.result-image-panel .button { width: 100%; box-sizing: border-box; }
+.result-image-panel .note { margin-bottom: 0; }
