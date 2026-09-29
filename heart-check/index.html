@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>心の現在地チェック</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="script.js" defer></script>
+</head>
+<body>
+  <main class="app">
+    <section id="start" class="card screen start-card">
+      <p class="start-kicker">なすぺんと、ひと息つこう</p>
+      <h1>心の現在地<br>チェック</h1>
+      <p class="start-lead">いまの気持ちを、少しだけ<br>見つめてみませんか。</p>
+      <div class="start-art">
+        <img src="nasupen-start.png" width="1280" height="1280" alt="椅子に座ったなすぺんが、白い子の話を聞きながらメモを取っているイラスト">
+      </div>
+      <p class="start-description">最近の自分を思い浮かべながら、「これ、あるかも」と感じるものを選んでみてください。正解も不正解もありません。</p>
+      <div class="start-meta" aria-label="全30問、所要時間の目安は約2〜3分"><span>全30問</span><span aria-hidden="true" class="meta-separator"></span><span>約2〜3分</span></div>
+      <button id="start-button" class="button primary start-button" type="button">はじめる <span aria-hidden="true">→</span></button>
+      <p class="note start-note">このチェックは医学的・心理学的な診断ではありません。今の自分を振り返るための簡単なチェックです。</p>
+    </section>
+
+    <section id="question" class="card screen" hidden aria-labelledby="question-text">
+      <div class="question-head"><span id="question-count"></span><span id="question-percent"></span></div>
+      <div class="progress" role="progressbar" aria-label="質問の進み具合" aria-valuemin="0" aria-valuemax="30"><div id="question-progress" class="progress-fill"></div></div>
+      <img class="question-mascot" src="nasupen-question.png" width="1280" height="1280" alt="" aria-hidden="true">
+      <h2 id="question-text" tabindex="-1"></h2>
+      <div class="answers" role="group" aria-label="回答を選ぶ">
+        <button class="button answer-button" type="button" data-answer="1">あるかも</button>
+        <button class="button answer-button" type="button" data-answer="0">あまりない</button>
+      </div>
+      <button id="back-button" class="text-button" type="button">← 戻る</button>
+    </section>
+
+    <section id="result" class="card screen" hidden>
+      <p class="eyebrow">いまの自分を見つめるヒント</p>
+      <h1>今回のチェック結果</h1>
+      <p class="score-label">「あるかも」と感じた数</p>
+      <p id="total-score" class="total-score"></p>
+      <div class="result-message">
+        <img src="nasupen-question.png" width="1280" height="1280" alt="" aria-hidden="true">
+        <p class="result-bubble">気づけたことがひとつあれば十分だよ</p>
+      </div>
+      <p id="overall-comment" class="comment"></p>
+      <h2>気になったところ</h2>
+      <div id="category-scores"></div>
+      <h2>特に反応が多かったところ</h2>
+      <div id="top-categories"></div>
+      <div id="type-messages"></div>
+      <div class="closing"><p>いちばん大事なのは点数ではありません。</p><p>「私はこんなところで疲れてたんだ」<br>「本当はこれが嫌だったのかも」<br>「だから最近、モヤモヤしてたのか」</p><p>そんなふうに、自分でも気づいていなかった心の違和感にひとつ気づけたら、それで十分です。</p></div>
+      <section class="share-panel" aria-labelledby="share-heading">
+        <h2 id="share-heading">結果を言葉にしてみる</h2>
+        <p>結果をコピーして、オープンチャットに書き込んでみませんか。言葉にすることで、今の気持ちを自分ごととして捉えるきっかけになります。</p>
+        <p class="share-note">書ける範囲だけで大丈夫です。</p>
+        <button class="button secondary copy-button" type="button">① 結果をコピー</button>
+        <a class="button primary openchat-link" href="https://line.me/ti/g2/vz6026P2emQFRi754TxJPKFENYqG4SlCyQK2Rg?utm_source=invitation&amp;utm_medium=link_copy&amp;utm_campaign=default" target="_blank" rel="noopener noreferrer">② オープンチャットを開く <span aria-hidden="true">↗</span></a>
+      </section>
+      <div class="actions"><button id="reflect-button" class="button primary" type="button">振り返ってみる</button><button class="button secondary retry-button" type="button">もう一度やる</button><button class="text-button home-button" type="button">最初に戻る</button></div>
+    </section>
+
+    <section id="reflection" class="card screen" hidden>
+      <p class="eyebrow">自分の言葉で</p>
+      <h1>少しだけ振り返ってみる</h1>
+      <label for="reflection-text">今回チェックを入れた中で、一番気になった言葉はありましたか？</label>
+      <div class="reflection-entry">
+        <textarea id="reflection-text" placeholder="ここに自由に書いてみてください"></textarea>
+        <img src="nasupen-reflection.png" width="1280" height="1280" alt="" aria-hidden="true">
+      </div>
+      <p class="note">ここに書いた内容は保存されません。ページを閉じると消えます。</p>
+      <div class="actions"><button id="result-button" class="button secondary" type="button">結果を見る</button><button class="button secondary copy-button" type="button">結果をコピー</button><button class="button primary retry-button" type="button">もう一度やる</button><button class="text-button home-button" type="button">最初に戻る</button></div>
+    </section>
+  </main>
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+</body>
+</html>
