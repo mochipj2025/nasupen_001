@@ -64,7 +64,18 @@
 .result-card .score-fill{background:linear-gradient(90deg,#8fb294,#5b8467)}
 .result-card .top-item{font-size:.92rem;line-height:1.5}
 .result-card-footer{margin:20px 0 0;padding:12px 14px;border-radius:12px;background:#eaf3e8;color:#3d6048;font-size:.88rem;font-weight:700;text-align:center}
-.download-card{margin-top:16px;border-color:#6c9176;color:#345b42}
+.download-card{margin-top:16px}
+.download-card.primary{
+  background:#426d57;
+  border-color:#426d57;
+  color:#fff;
+  box-shadow:0 8px 18px rgba(52,91,71,.22);
+}
+.download-card.primary:hover{
+  background:#345b47;
+  border-color:#345b47;
+  color:#fff;
+}
 #result .comment{margin-top:30px}
 @media(max-width:380px){.result-card{padding:20px 16px}.result-card-header img{width:66px;height:66px}}
 
