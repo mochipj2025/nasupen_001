@@ -37,17 +37,21 @@
     <section id="result" class="card screen" hidden>
       <p class="eyebrow">いまの自分を見つめるヒント</p>
       <h1>今回のチェック結果</h1>
-      <p class="score-label">「あるかも」と感じた数</p>
-      <p id="total-score" class="total-score"></p>
-      <div class="result-message">
-        <img src="nasupen-question.png" width="1280" height="1280" alt="" aria-hidden="true">
-        <p class="result-bubble">気づけたことがひとつあれば十分だよ</p>
-      </div>
+      <section id="result-card" class="result-card" aria-labelledby="result-card-heading">
+        <div class="result-card-header">
+          <div><p class="result-card-kicker">心の現在地チェック</p><h2 id="result-card-heading">今回の記録</h2></div>
+          <img src="nasupen-question.png" width="1280" height="1280" alt="" aria-hidden="true">
+        </div>
+        <p class="score-label">「あるかも」と感じた数</p>
+        <p id="total-score" class="total-score"></p>
+        <h3>チェックが入った項目</h3>
+        <div id="category-scores"></div>
+        <h3>特に反応が多かったところ</h3>
+        <div id="top-categories"></div>
+        <p class="result-card-footer">気づけたことがひとつあれば十分だよ</p>
+      </section>
+      <button id="download-card" class="button secondary download-card" type="button">このカードをPNGで保存</button>
       <p id="overall-comment" class="comment"></p>
-      <h2>気になったところ</h2>
-      <div id="category-scores"></div>
-      <h2>特に反応が多かったところ</h2>
-      <div id="top-categories"></div>
       <div id="type-messages"></div>
       <div class="closing"><p>いちばん大事なのは点数ではありません。</p><p>「私はこんなところで疲れてたんだ」<br>「本当はこれが嫌だったのかも」<br>「だから最近、モヤモヤしてたのか」</p><p>そんなふうに、自分でも気づいていなかった心の違和感にひとつ気づけたら、それで十分です。</p></div>
       <section class="share-panel" aria-labelledby="share-heading">

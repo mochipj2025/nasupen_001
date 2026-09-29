@@ -143,6 +143,108 @@ async function copyResult() {
   }
 }
 
+function paintRoundedRect(context, x, y, width, height, radius, color) {
+  context.beginPath();
+  context.moveTo(x + radius, y);
+  context.lineTo(x + width - radius, y);
+  context.quadraticCurveTo(x + width, y, x + width, y + radius);
+  context.lineTo(x + width, y + height - radius);
+  context.quadraticCurveTo(x + width, y + height, x + width - radius, y + height);
+  context.lineTo(x + radius, y + height);
+  context.quadraticCurveTo(x, y + height, x, y + height - radius);
+  context.lineTo(x, y + radius);
+  context.quadraticCurveTo(x, y, x + radius, y);
+  context.closePath();
+  context.fillStyle = color;
+  context.fill();
+}
+
+async function downloadResultCard() {
+  const { scores, total, top } = calculateResult();
+  const canvas = document.createElement("canvas");
+  canvas.width = 1080;
+  canvas.height = 1740;
+  const context = canvas.getContext("2d");
+  if (!context) { toast("画像を作成できませんでした"); return; }
+
+  context.fillStyle = "#f7f6f2";
+  context.fillRect(0, 0, canvas.width, canvas.height);
+  paintRoundedRect(context, 55, 55, 970, 1630, 52, "#ffffff");
+  paintRoundedRect(context, 90, 90, 900, 270, 34, "#f1f6ef");
+  context.fillStyle = "#536d58";
+  context.font = '700 27px "Hiragino Sans", "Yu Gothic", sans-serif';
+  context.fillText("なすぺんと、ひと息つこう", 130, 160);
+  context.fillStyle = "#403346";
+  context.font = '700 55px "Hiragino Sans", "Yu Gothic", sans-serif';
+  context.fillText("心の現在地チェック", 130, 232);
+  context.font = '700 32px "Hiragino Sans", "Yu Gothic", sans-serif';
+  context.fillText("今回の記録", 130, 294);
+
+  const mascot = document.querySelector(".result-card-header img");
+  try { await mascot.decode(); } catch { /* The graph remains usable without the decoration. */ }
+  if (mascot.naturalWidth) context.drawImage(mascot, 785, 115, 160, 160);
+
+  context.fillStyle = "#59645f";
+  context.font = '500 29px "Hiragino Sans", "Yu Gothic", sans-serif';
+  context.fillText("「あるかも」と感じた数", 130, 435);
+  context.fillStyle = "#426d57";
+  context.font = '700 108px "Hiragino Sans", "Yu Gothic", sans-serif';
+  context.fillText(String(total), 130, 553);
+  context.font = '600 40px "Hiragino Sans", "Yu Gothic", sans-serif';
+  context.fillText(`/ ${questions.length}`, total >= 10 ? 275 : 215, 548);
+
+  context.fillStyle = "#44594c";
+  context.font = '700 32px "Hiragino Sans", "Yu Gothic", sans-serif';
+  context.fillText("チェックが入った項目", 130, 635);
+  categories.forEach((category, index) => {
+    const y = 700 + index * 123;
+    context.fillStyle = "#303b38";
+    context.font = '600 28px "Hiragino Sans", "Yu Gothic", sans-serif';
+    context.fillText(category.name, 130, y);
+    context.textAlign = "right";
+    context.fillStyle = "#426d57";
+    context.fillText(`${scores[category.key]} / 6`, 940, y);
+    context.textAlign = "left";
+    paintRoundedRect(context, 130, y + 26, 810, 22, 11, "#e5ebe5");
+    if (scores[category.key] > 0) {
+      paintRoundedRect(context, 130, y + 26, 810 * scores[category.key] / 6, 22, 11, "#6f9b7c");
+    }
+  });
+
+  context.fillStyle = "#44594c";
+  context.font = '700 32px "Hiragino Sans", "Yu Gothic", sans-serif';
+  context.fillText("特に反応が多かったところ", 130, 1328);
+  const topLines = top.length ? top.map(category => category.name) : ["今回は特にありませんでした"];
+  context.fillStyle = "#426d57";
+  context.font = '600 28px "Hiragino Sans", "Yu Gothic", sans-serif';
+  topLines.forEach((line, index) => context.fillText(line, 130, 1380 + index * 43));
+
+  paintRoundedRect(context, 100, 1600, 880, 60, 18, "#eaf3e8");
+  context.fillStyle = "#3d6048";
+  context.textAlign = "center";
+  context.font = '700 27px "Hiragino Sans", "Yu Gothic", sans-serif';
+  context.fillText("気づけたことがひとつあれば十分だよ", 540, 1641);
+  context.textAlign = "left";
+
+  try {
+    const blob = await new Promise(resolve => canvas.toBlob(resolve, "image/png"));
+    if (!blob) throw new Error("PNG export failed");
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    const today = new Date();
+    const dateStamp = [today.getFullYear(), String(today.getMonth() + 1).padStart(2, "0"), String(today.getDate()).padStart(2, "0")].join("-");
+    link.download = `heart-check-result-${dateStamp}.png`;
+    document.body.append(link);
+    link.click();
+    link.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 60000);
+    toast("画像の保存を開始しました");
+  } catch {
+    toast("画像を保存できませんでした");
+  }
+}
+
 function resetAndStart() {
   answers = Array(questions.length).fill(null);
   currentIndex = 0;
@@ -163,6 +265,7 @@ document.getElementById("back-button").addEventListener("click", () => {
 document.getElementById("reflect-button").addEventListener("click", () => showScreen("reflection"));
 document.getElementById("result-button").addEventListener("click", () => showScreen("result"));
 document.querySelectorAll(".copy-button").forEach(button => button.addEventListener("click", copyResult));
+document.getElementById("download-card").addEventListener("click", downloadResultCard);
 document.querySelectorAll(".retry-button").forEach(button => button.addEventListener("click", resetAndStart));
 document.querySelectorAll(".home-button").forEach(button => button.addEventListener("click", () => {
   answers = Array(questions.length).fill(null);
