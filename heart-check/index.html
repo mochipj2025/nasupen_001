@@ -37,43 +37,48 @@
     <section id="result" class="card screen" hidden>
       <p class="eyebrow">いまの自分を見つめるヒント</p>
       <h1>今回のチェック結果</h1>
-      <section id="result-card" class="result-card" aria-labelledby="result-card-heading">
-        <div class="result-card-header">
-          <div><p class="result-card-kicker">心の現在地チェック</p><h2 id="result-card-heading">今回の記録</h2></div>
-          <img src="nasupen-question.png" width="1280" height="1280" alt="" aria-hidden="true">
-        </div>
-        <p class="score-label">「あるかも」と感じた数</p>
-        <p id="total-score" class="total-score"></p>
-        <h3>チェックが入った項目</h3>
-        <div id="category-scores"></div>
-        <h3>特に反応が多かったところ</h3>
+
+      <section class="result-focus" aria-labelledby="result-focus-heading">
+        <p class="result-focus-label">今回いちばん反応が多かったところ</p>
         <div id="top-categories"></div>
+        <div id="type-messages"></div>
         <p class="result-card-footer">気づけたことがひとつあれば十分だよ</p>
       </section>
-      <button id="download-card" class="button secondary download-card" type="button">このカードをPNGで保存</button>
-      <p id="overall-comment" class="comment"></p>
-      <div id="type-messages"></div>
-      <div class="closing"><p>いちばん大事なのは点数ではありません。</p><p>「私はこんなところで疲れてたんだ」<br>「本当はこれが嫌だったのかも」<br>「だから最近、モヤモヤしてたのか」</p><p>そんなふうに、自分でも気づいていなかった心の違和感にひとつ気づけたら、それで十分です。</p></div>
-      <section class="share-panel" aria-labelledby="share-heading">
-        <h2 id="share-heading">結果を言葉にしてみる</h2>
-        <p>結果をコピーして、オープンチャットに書き込んでみませんか。言葉にすることで、今の気持ちを自分ごととして捉えるきっかけになります。</p>
-        <p class="share-note">書ける範囲だけで大丈夫です。</p>
-        <button class="button secondary copy-button" type="button">① 結果をコピー</button>
-        <a class="button primary openchat-link" href="https://line.me/ti/g2/vz6026P2emQFRi754TxJPKFENYqG4SlCyQK2Rg?utm_source=invitation&amp;utm_medium=link_copy&amp;utm_campaign=default" target="_blank" rel="noopener noreferrer">② オープンチャットを開く <span aria-hidden="true">↗</span></a>
-      </section>
-      <div class="actions"><button id="reflect-button" class="button primary" type="button">振り返ってみる</button><button class="button secondary retry-button" type="button">もう一度やる</button><button class="text-button home-button" type="button">最初に戻る</button></div>
-    </section>
 
-    <section id="reflection" class="card screen" hidden>
-      <p class="eyebrow">自分の言葉で</p>
-      <h1>少しだけ振り返ってみる</h1>
-      <label for="reflection-text">今回チェックを入れた中で、一番気になった言葉はありましたか？</label>
-      <div class="reflection-entry">
-        <textarea id="reflection-text" placeholder="ここに自由に書いてみてください"></textarea>
-        <img src="nasupen-reflection.png" width="1280" height="1280" alt="" aria-hidden="true">
+      <button id="download-card" class="button primary download-card" type="button">結果を画像で保存する</button>
+
+      <details class="details-panel">
+        <summary>ほかの結果も見る</summary>
+        <div class="details-panel-body">
+          <p class="score-label">「あるかも」と感じた数</p>
+          <p id="total-score" class="total-score"></p>
+          <div id="category-scores"></div>
+          <p id="overall-comment" class="comment"></p>
+        </div>
+      </details>
+
+      <section class="reflection-panel" aria-labelledby="reflection-heading">
+        <h2 id="reflection-heading">少しだけ振り返ってみる</h2>
+        <label for="reflection-text">今回の中で、いちばん気になった言葉はありましたか？</label>
+        <div class="reflection-entry">
+          <textarea id="reflection-text" placeholder="うまく文章にしなくても大丈夫です。気になったことを自由に書いてみてください。"></textarea>
+          <img src="nasupen-reflection.png" width="1280" height="1280" alt="" aria-hidden="true">
+        </div>
+        <p class="note">ここに書いた内容は、このページを閉じると消えます。</p>
+      </section>
+
+      <section class="share-panel" aria-labelledby="share-heading">
+        <h2 id="share-heading">誰かに話してみたいとき</h2>
+        <p>今回の結果をオープンチャットに書いてみることもできます。うまく文章にしなくても大丈夫です。</p>
+        <p class="share-note">まず結果をコピーして、そのあとオープンチャットを開いて貼り付けてください。</p>
+        <button class="button secondary copy-button" type="button">結果をコピーする</button>
+        <a class="button primary openchat-link" href="https://line.me/ti/g2/vz6026P2emQFRi754TxJPKFENYqG4SlCyQK2Rg?utm_source=invitation&amp;utm_medium=link_copy&amp;utm_campaign=default" target="_blank" rel="noopener noreferrer">オープンチャットを開く <span aria-hidden="true">↗</span></a>
+      </section>
+
+      <div class="actions">
+        <button class="button secondary retry-button" type="button">もう一度やる</button>
+        <button class="text-button home-button" type="button">最初に戻る</button>
       </div>
-      <p class="note">ここに書いた内容は保存されません。ページを閉じると消えます。</p>
-      <div class="actions"><button id="result-button" class="button secondary" type="button">結果を見る</button><button class="button secondary copy-button" type="button">結果をコピー</button><button class="button primary retry-button" type="button">もう一度やる</button><button class="text-button home-button" type="button">最初に戻る</button></div>
     </section>
   </main>
   <div id="toast" class="toast" role="status" aria-live="polite"></div>
