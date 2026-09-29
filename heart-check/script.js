@@ -112,8 +112,25 @@ function renderResult() {
 }
 
 function copyText() {
-  const { scores, top } = calculateResult();
-  return ["心の現在地チェックをやってみました。", "", ...categories.map(category => `${category.name}　${scores[category.key]} / 6`), "", ...(top.length ? ["今回は", ...top.map(category => category.name), "のチェックが多めでした。"] : ["今回は特に反応が多かったところはありませんでした。"])].join("\n");
+  const { top } = calculateResult();
+  const reflection = document.getElementById("reflection-text")?.value.trim();
+  const lines = ["心の現在地チェックをやってみました。", ""];
+
+  if (top.length) {
+    lines.push("今回いちばん反応が多かったのは");
+    top.forEach(category => lines.push(`「${category.name.replace(/^\\d+[①-⑤]?\\s*/, "")}」`));
+    lines.push("でした。");
+  } else {
+    lines.push("今回は、特に反応が多かったところはありませんでした。");
+  }
+
+  if (reflection) {
+    lines.push("", "今回気になったこと：", reflection);
+  } else {
+    lines.push("", "うまく言葉にできないけど、少し話してみたいです。");
+  }
+
+  return lines.join("\n");
 }
 
 function toast(message) {
@@ -159,106 +176,108 @@ function paintRoundedRect(context, x, y, width, height, radius, color) {
   context.fill();
 }
 
+function wrapCanvasText(context, text, x, y, maxWidth, lineHeight) {
+  const paragraphs = text.split("\n");
+  let currentY = y;
+  paragraphs.forEach((paragraph, paragraphIndex) => {
+    if (!paragraph) {
+      currentY += lineHeight * 0.7;
+      return;
+    }
+    let line = "";
+    Array.from(paragraph).forEach(char => {
+      const testLine = line + char;
+      if (context.measureText(testLine).width > maxWidth && line) {
+        context.fillText(line, x, currentY);
+        line = char;
+        currentY += lineHeight;
+      } else {
+        line = testLine;
+      }
+    });
+    if (line) {
+      context.fillText(line, x, currentY);
+      currentY += lineHeight;
+    }
+    if (paragraphIndex < paragraphs.length - 1) currentY += lineHeight * 0.25;
+  });
+  return currentY;
+}
+
 async function downloadResultCard() {
-  const { scores, total, top } = calculateResult();
+  const { scores, top } = calculateResult();
   const canvas = document.createElement("canvas");
   canvas.width = 1080;
-  canvas.height = 1740;
+  canvas.height = 1350;
   const context = canvas.getContext("2d");
   if (!context) { toast("画像を作成できませんでした"); return; }
 
   context.fillStyle = "#f7f6f2";
   context.fillRect(0, 0, canvas.width, canvas.height);
-  paintRoundedRect(context, 55, 55, 970, 1630, 52, "#ffffff");
-  paintRoundedRect(context, 90, 90, 900, 270, 34, "#f1f6ef");
-  context.fillStyle = "#536d58";
-  context.font = '700 27px "Hiragino Sans", "Yu Gothic", sans-serif';
-  context.fillText("なすぺんと、ひと息つこう", 130, 160);
-  context.fillStyle = "#403346";
-  context.font = '700 55px "Hiragino Sans", "Yu Gothic", sans-serif';
-  context.fillText("心の現在地チェック", 130, 232);
-  context.font = '700 32px "Hiragino Sans", "Yu Gothic", sans-serif';
-  context.fillText("今回の記録", 130, 294);
+  paintRoundedRect(context, 55, 55, 970, 1240, 52, "#ffffff");
 
-  // PNG保存を最優先にするため、外部画像はCanvasへ描画しない。
-  // file:// でのローカル確認や一部ブラウザでは、画像を描画したCanvasが
-  // セキュリティ制約でエクスポート不可になることがある。
+  context.fillStyle = "#536d58";
+  context.font = '700 28px "Hiragino Sans", "Yu Gothic", sans-serif';
+  context.fillText("なすぺんと、ひと息つこう", 120, 145);
+
+  context.fillStyle = "#403346";
+  context.font = '700 56px "Hiragino Sans", "Yu Gothic", sans-serif';
+  context.fillText("心の現在地チェック", 120, 225);
 
   context.fillStyle = "#59645f";
-  context.font = '500 29px "Hiragino Sans", "Yu Gothic", sans-serif';
-  context.fillText("「あるかも」と感じた数", 130, 435);
-  context.fillStyle = "#426d57";
-  context.font = '700 108px "Hiragino Sans", "Yu Gothic", sans-serif';
-  context.fillText(String(total), 130, 553);
-  context.font = '600 40px "Hiragino Sans", "Yu Gothic", sans-serif';
-  context.fillText(`/ ${questions.length}`, total >= 10 ? 275 : 215, 548);
-
-  context.fillStyle = "#44594c";
-  context.font = '700 32px "Hiragino Sans", "Yu Gothic", sans-serif';
-  context.fillText("チェックが入った項目", 130, 635);
-  categories.forEach((category, index) => {
-    const y = 700 + index * 123;
-    context.fillStyle = "#303b38";
-    context.font = '600 28px "Hiragino Sans", "Yu Gothic", sans-serif';
-    context.fillText(category.name, 130, y);
-    context.textAlign = "right";
-    context.fillStyle = "#426d57";
-    context.fillText(`${scores[category.key]} / 6`, 940, y);
-    context.textAlign = "left";
-    paintRoundedRect(context, 130, y + 26, 810, 22, 11, "#e5ebe5");
-    if (scores[category.key] > 0) {
-      paintRoundedRect(context, 130, y + 26, 810 * scores[category.key] / 6, 22, 11, "#6f9b7c");
-    }
-  });
-
-  context.fillStyle = "#44594c";
-  context.font = '700 32px "Hiragino Sans", "Yu Gothic", sans-serif';
-  context.fillText("特に反応が多かったところ", 130, 1328);
-  const topLines = top.length ? top.map(category => category.name) : ["今回は特にありませんでした"];
-  context.fillStyle = "#426d57";
   context.font = '600 28px "Hiragino Sans", "Yu Gothic", sans-serif';
-  topLines.forEach((line, index) => context.fillText(line, 130, 1380 + index * 43));
+  context.fillText("今回いちばん反応が多かったところ", 120, 320);
 
-  paintRoundedRect(context, 100, 1600, 880, 60, 18, "#eaf3e8");
+  let y = 390;
+  const displayTop = top.length ? top : [];
+  if (!displayTop.length) {
+    context.fillStyle = "#426d57";
+    context.font = '700 40px "Hiragino Sans", "Yu Gothic", sans-serif';
+    context.fillText("今回は特にありませんでした", 120, y);
+    y += 90;
+  } else {
+    displayTop.forEach(category => {
+      context.fillStyle = "#426d57";
+      context.font = '700 44px "Hiragino Sans", "Yu Gothic", sans-serif';
+      y = wrapCanvasText(context, category.name, 120, y, 840, 60);
+      context.fillStyle = "#6b756f";
+      context.font = '600 30px "Hiragino Sans", "Yu Gothic", sans-serif';
+      context.fillText(`${scores[category.key]} / 6`, 120, y + 8);
+      y += 72;
+
+      context.fillStyle = "#303b38";
+      context.font = '500 30px "Hiragino Sans", "Yu Gothic", sans-serif';
+      y = wrapCanvasText(context, category.message, 120, y, 840, 48) + 36;
+    });
+  }
+
+  paintRoundedRect(context, 100, 1170, 880, 72, 20, "#eaf3e8");
   context.fillStyle = "#3d6048";
   context.textAlign = "center";
-  context.font = '700 27px "Hiragino Sans", "Yu Gothic", sans-serif';
-  context.fillText("気づけたことがひとつあれば十分だよ", 540, 1641);
+  context.font = '700 28px "Hiragino Sans", "Yu Gothic", sans-serif';
+  context.fillText("気づけたことがひとつあれば十分だよ", 540, 1217);
   context.textAlign = "left";
 
   try {
     const blob = await new Promise((resolve, reject) => {
-      canvas.toBlob(result => {
-        if (result) resolve(result);
-        else reject(new Error("PNG export failed"));
-      }, "image/png");
+      canvas.toBlob(result => result ? resolve(result) : reject(new Error("PNG export failed")), "image/png");
     });
-
     const today = new Date();
-    const dateStamp = [
-      today.getFullYear(),
-      String(today.getMonth() + 1).padStart(2, "0"),
-      String(today.getDate()).padStart(2, "0")
-    ].join("-");
-    const fileName = `heart-check-result-${dateStamp}.png`;
+    const dateStamp = [today.getFullYear(), String(today.getMonth() + 1).padStart(2, "0"), String(today.getDate()).padStart(2, "0")].join("-");
     const url = URL.createObjectURL(blob);
     const link = document.createElement("a");
-
     link.href = url;
-    link.download = fileName;
+    link.download = `heart-check-result-${dateStamp}.png`;
     link.rel = "noopener";
     link.style.display = "none";
     document.body.append(link);
     link.click();
     link.remove();
-
-    // Blob URLはクリック直後に破棄するとSafari系で保存に失敗することがあるため、
-    // 十分に猶予を置いてから解放する。
     setTimeout(() => URL.revokeObjectURL(url), 120000);
-    toast("PNGの保存を開始しました");
+    toast("結果画像の保存を開始しました");
   } catch (error) {
     console.error("PNG save failed:", error);
-    toast("PNGを保存できませんでした");
+    toast("画像を保存できませんでした");
   }
 }
 
@@ -279,8 +298,6 @@ document.getElementById("back-button").addEventListener("click", () => {
   if (currentIndex > 0) { currentIndex -= 1; renderQuestion(); }
   else showScreen("start");
 });
-document.getElementById("reflect-button").addEventListener("click", () => showScreen("reflection"));
-document.getElementById("result-button").addEventListener("click", () => showScreen("result"));
 document.querySelectorAll(".copy-button").forEach(button => button.addEventListener("click", copyResult));
 document.getElementById("download-card").addEventListener("click", downloadResultCard);
 document.querySelectorAll(".retry-button").forEach(button => button.addEventListener("click", resetAndStart));
