@@ -126,8 +126,6 @@ function copyText() {
 
   if (reflection) {
     lines.push("", "今回気になったこと：", reflection);
-  } else {
-    lines.push("", "うまく言葉にできないけど、少し話してみたいです。");
   }
 
   return lines.join("\n");
