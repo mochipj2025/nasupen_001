@@ -118,7 +118,7 @@ function copyText() {
 
   if (top.length) {
     lines.push("今回いちばん反応が多かったのは");
-    top.forEach(category => lines.push(`「${category.name.replace(/^\\d+[①-⑤]?\\s*/, "")}」`));
+    top.forEach(category => lines.push(`「${category.name.replace(/^[①-⑤]\\s*/, "")}」`));
     lines.push("でした。");
   } else {
     lines.push("今回は、特に反応が多かったところはありませんでした。");
