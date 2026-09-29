@@ -180,9 +180,9 @@ async function downloadResultCard() {
   context.font = '700 32px "Hiragino Sans", "Yu Gothic", sans-serif';
   context.fillText("今回の記録", 130, 294);
 
-  const mascot = document.querySelector(".result-card-header img");
-  try { await mascot.decode(); } catch { /* The graph remains usable without the decoration. */ }
-  if (mascot.naturalWidth) context.drawImage(mascot, 785, 115, 160, 160);
+  // PNG保存を最優先にするため、外部画像はCanvasへ描画しない。
+  // file:// でのローカル確認や一部ブラウザでは、画像を描画したCanvasが
+  // セキュリティ制約でエクスポート不可になることがある。
 
   context.fillStyle = "#59645f";
   context.font = '500 29px "Hiragino Sans", "Yu Gothic", sans-serif';
@@ -227,21 +227,38 @@ async function downloadResultCard() {
   context.textAlign = "left";
 
   try {
-    const blob = await new Promise(resolve => canvas.toBlob(resolve, "image/png"));
-    if (!blob) throw new Error("PNG export failed");
+    const blob = await new Promise((resolve, reject) => {
+      canvas.toBlob(result => {
+        if (result) resolve(result);
+        else reject(new Error("PNG export failed"));
+      }, "image/png");
+    });
+
+    const today = new Date();
+    const dateStamp = [
+      today.getFullYear(),
+      String(today.getMonth() + 1).padStart(2, "0"),
+      String(today.getDate()).padStart(2, "0")
+    ].join("-");
+    const fileName = `heart-check-result-${dateStamp}.png`;
     const url = URL.createObjectURL(blob);
     const link = document.createElement("a");
+
     link.href = url;
-    const today = new Date();
-    const dateStamp = [today.getFullYear(), String(today.getMonth() + 1).padStart(2, "0"), String(today.getDate()).padStart(2, "0")].join("-");
-    link.download = `heart-check-result-${dateStamp}.png`;
+    link.download = fileName;
+    link.rel = "noopener";
+    link.style.display = "none";
     document.body.append(link);
     link.click();
     link.remove();
-    setTimeout(() => URL.revokeObjectURL(url), 60000);
-    toast("画像の保存を開始しました");
-  } catch {
-    toast("画像を保存できませんでした");
+
+    // Blob URLはクリック直後に破棄するとSafari系で保存に失敗することがあるため、
+    // 十分に猶予を置いてから解放する。
+    setTimeout(() => URL.revokeObjectURL(url), 120000);
+    toast("PNGの保存を開始しました");
+  } catch (error) {
+    console.error("PNG save failed:", error);
+    toast("PNGを保存できませんでした");
   }
 }
 
