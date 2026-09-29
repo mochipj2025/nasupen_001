@@ -67,3 +67,19 @@
 .download-card{margin-top:16px;border-color:#6c9176;color:#345b42}
 #result .comment{margin-top:30px}
 @media(max-width:380px){.result-card{padding:20px 16px}.result-card-header img{width:66px;height:66px}}
+
+
+/* Simplified result flow for first-time users */
+.result-focus{padding:22px 20px;border:1px solid #dce7de;border-radius:22px;background:linear-gradient(160deg,#f6faf5 0%,#fff 58%,#faf7fb 100%)}
+.result-focus-label{margin:0 0 14px;color:#59645f;font-size:.9rem;font-weight:700}
+.result-focus .top-item{font-size:1.25rem;line-height:1.5;color:#365d49;margin-bottom:12px}
+.result-focus .type-message{margin-top:12px}
+.details-panel{margin-top:18px;border:1px solid #dde5df;border-radius:16px;background:#fbfcfb;overflow:hidden}
+.details-panel summary{cursor:pointer;padding:16px 18px;color:#365d49;font-weight:700}
+.details-panel-body{padding:0 18px 18px}
+.details-panel .comment{margin-top:22px}
+.reflection-panel{margin-top:28px;padding:22px 18px;border-radius:18px;background:#f7f7f3;border:1px solid #e7e6df}
+.reflection-panel h2{margin:0 0 8px;color:#4b564f}
+.reflection-panel label{margin-top:8px}
+.download-card{margin-top:16px}
+#result .share-panel{margin-top:28px}
